@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GridWorld - HW1</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>GridWorld AIOT HW1</h1>
+        
+        <div class="controls">
+            <label for="grid-n">Dimension n (5-9):</label>
+            <input type="number" id="grid-n" value="5" min="5" max="9">
+            <button id="reset-btn">Reset Grid</button>
+            <button id="evaluate-btn">Evaluate Policy</button>
+        </div>
+
+        <div id="status" class="status-msg">
+            Click a cell to set the START point (Green).
+        </div>
+
+        <div id="grid-container" class="grid">
+            <!-- Grid will be generated here -->
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
