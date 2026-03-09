@@ -4,7 +4,7 @@ import pandas as pd
 
 st.set_page_config(page_title="和風 GridWorld: Value Iteration", layout="wide")
 
-# Japanese Zen Artistic Styling
+# Enhanced Japanese Zen Artistic Styling
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap');
@@ -13,72 +13,93 @@ st.markdown("""
         font-family: 'Noto Serif JP', serif;
     }
 
-    /* Traditional Washi Paper Background */
+    /* Traditional Washi Paper Background with discrete texture */
     .stApp {
         background-color: #fcfcfc;
         background-image: 
-            radial-gradient(#e5e7eb 0.5px, transparent 0.5px),
-            radial-gradient(#e5e7eb 0.5px, #fcfcfc 0.5px);
-        background-size: 20px 20px;
-        background-position: 0 0, 10px 10px;
-        color: #1f2937;
+            radial-gradient(#d1d5db 0.4px, transparent 0.4px),
+            radial-gradient(#d1d5db 0.4px, #fcfcfc 0.4px);
+        background-size: 24px 24px;
+        background-position: 0 0, 12px 12px;
+        color: #111827;
     }
 
-    /* Sidebar Styling - Lacquer Red Accent */
+    /* Sidebar Styling - Lacquer Red Border */
     [data-testid="stSidebar"] {
-        background-color: #f8fafc !important;
-        border-right: 3px solid #ef4444;
+        background-color: #f9fafb !important;
+        border-right: 2px solid #ef4444;
     }
 
-    /* Calligraphic Header */
+    /* Calligraphic Header with deeper red */
     h1 {
-        color: #ef4444;
+        color: #b91c1c;
         font-weight: 700;
         text-align: center;
-        border-bottom: 2px solid #ef4444;
-        padding-bottom: 15px;
-        margin-bottom: 35px !important;
-        letter-spacing: 0.15em;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        border-bottom: 1px solid #b91c1c;
+        padding-bottom: 20px;
+        margin-bottom: 40px !important;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
     }
 
-    /* Grid Button Styling - Zen Minimalism */
+    /* Grid Button Styling - Zen Minimalist Box */
     .stButton > button {
-        border-radius: 2px !important;
-        height: 75px !important;
+        border-radius: 0px !important; /* Sharp corners for traditional feel */
+        height: 80px !important;
         background: white !important;
-        border: 2px solid #1f2937 !important;
+        border: 1.5px solid #1f2937 !important;
         color: #1f2937 !important;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        transition: all 0.3s ease !important;
         font-weight: 600 !important;
-        box-shadow: 3px 3px 0px #1f2937 !important;
+        box-shadow: 4px 4px 0px #1f2937 !important;
+        font-size: 1.1rem !important;
     }
 
     .stButton > button:hover {
         border-color: #ef4444 !important;
         color: #ef4444 !important;
         transform: translate(-2px, -2px);
-        box-shadow: 5px 5px 0px #ef4444 !important;
+        box-shadow: 6px 6px 0px #ef4444 !important;
     }
 
     .stButton > button:active {
-        transform: translate(1px, 1px);
-        box-shadow: 1px 1px 0px #ef4444 !important;
+        transform: translate(2px, 2px);
+        box-shadow: 0px 0px 0px #ef4444 !important;
     }
 
-    /* Status Card - Ink Brush Style */
+    /* Primary Button Styling (VI Button) */
+    div.stButton > button[kind="primary"] {
+        background: #ef4444 !important;
+        color: white !important;
+        border: 1.5px solid #b91c1c !important;
+        box-shadow: 4px 4px 0px #991b1b !important;
+    }
+
+    div.stButton > button[kind="primary"]:hover {
+        background: #dc2626 !important;
+        box-shadow: 6px 6px 0px #991b1b !important;
+    }
+
+    /* Status Card - Subtle Ink Wash Effect */
     .status-card {
-        background: rgba(255, 250, 250, 0.8);
-        border-left: 6px solid #ef4444;
-        padding: 1.2rem;
-        margin-bottom: 2.5rem;
-        box-shadow: 0 8px 12px -4px rgba(0,0,0,0.1);
+        background: rgba(255, 255, 255, 0.9);
+        border-left: 8px solid #b91c1c;
+        padding: 1.5rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        font-style: italic;
+    }
+
+    /* Table Styling */
+    .stTable {
+        border: 1px solid #e5e7eb;
         border-radius: 4px;
+        overflow: hidden;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Session State Initialization (Fixed naming to avoid dict conflicts)
+# Session State Initialization
 if "n" not in st.session_state: st.session_state.n = 5
 if "start_cell" not in st.session_state: st.session_state.start_cell = None
 if "end_cell" not in st.session_state: st.session_state.end_cell = None
@@ -93,7 +114,7 @@ def reset_callback():
     st.session_state.pi_policy = None
     st.session_state.v_vals = None
 
-st.title("⛩️ 和風 GridWorld: 強化學習之美")
+st.title("⛩️ 和風 GridWorld")
 
 with st.sidebar:
     st.markdown("### 📜 卷軸設定 (Settings)")
@@ -106,7 +127,8 @@ with st.sidebar:
     
     st.divider()
     
-    if st.button("🎲 隨機初始化 (HW1-2)", use_container_width=True):
+    # Specific Button Names requested by user
+    if st.button("🎲 隨機初始化", use_container_width=True):
         st.session_state.pi_policy = grid_logic.generate_random_policy(st.session_state.n)
         st.session_state.v_vals = None
         st.toast("隨機策略已載入。")
@@ -115,7 +137,6 @@ with st.sidebar:
         if st.session_state.start_cell and st.session_state.end_cell and \
            len(st.session_state.obstacles) == st.session_state.n - 2:
             
-            # Implementation of Value Iteration
             v_vals, pi_policy = grid_logic.value_iteration(
                 st.session_state.n, 
                 st.session_state.end_cell, 
@@ -137,7 +158,7 @@ with st.container():
         rem = st.session_state.n - 2 - len(st.session_state.obstacles)
         st.markdown(f"🪨 **第三步**：佈置 **礙世之石** ({len(st.session_state.obstacles)}/{st.session_state.n-2})。")
     elif not st.session_state.pi_policy and not st.session_state.v_vals:
-        st.markdown("🎲 **第四步**：生成隨機策略 (HW1-2) 或直接執行價值迭代。")
+        st.markdown("🎲 **第四步**：點擊「隨機初始化」或直接「執行價值迭代」。")
     else:
         st.markdown("🌸 **心法大成**：最優價值與策略已顯現於網格。")
     st.markdown('</div>', unsafe_allow_html=True)
